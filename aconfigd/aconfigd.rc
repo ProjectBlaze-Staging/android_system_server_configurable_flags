@@ -24,15 +24,20 @@ service system_aconfigd_socket_service /system/bin/aconfigd-system start-socket
     socket aconfigd_system stream 666 system system
 
 on early-init
+    exec u:r:su:s0 root root -- /system/bin/rm -rf /metadata/dsu_logs /metadata/gsi/dsu/prev_kmsg /metadata/gsi/dsu/prev_logcat /metadata/gsi/dsu/cur_kmsg /metadata/gsi/dsu/cur_logcat /metadata/gsi/dsu/cur_state
     mkdir /metadata/aconfig 0775 root system
+    mount tmpfs tmpfs /metadata/aconfig mode=0775,uid=0,gid=1000
     mkdir /metadata/aconfig/flags 0770 root system
     mkdir /metadata/aconfig/maps 0775 root system
     mkdir /metadata/aconfig/boot 0775 root system
+    restorecon_recursive /metadata/aconfig
     exec_start early_system_aconfigd_platform_init
 
 on post-fs
+    exec u:r:su:s0 root root -- /system/bin/rm -rf /metadata/dsu_logs /metadata/gsi/dsu/prev_kmsg /metadata/gsi/dsu/prev_logcat /metadata/gsi/dsu/cur_kmsg /metadata/gsi/dsu/cur_logcat /metadata/gsi/dsu/cur_state
     mkdir /metadata/aconfig 0775 root system
     mkdir /metadata/aconfig/flags 0770 root system
     mkdir /metadata/aconfig/maps 0775 root system
     mkdir /metadata/aconfig/boot 0775 root system
+    restorecon_recursive /metadata/aconfig
     exec_start system_aconfigd_platform_init
